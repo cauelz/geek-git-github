@@ -1,0 +1,91 @@
+Git rebase vs merge: diferenças e qual escolher em cada situação
+Olá, pessoal!
+
+Muito se discute sobre qual é a melhor maneira de realizar o merge das alterações de uma branch para outra com o Git. Como opções, temos o merge e rebase. De fato, ambas tem sua utilidade, mas quando devemos usar uma solução em detrimento da outra?
+
+Primeiro, vamos explicar o que cada uma delas faz.
+
+Comecemos com um exemplo simples. Imagine que você está fazendo commits na branch master com outras pessoas da sua equipe. Para simplificar o cenário1, vocês estão usando o Github para sincronizar todos os commits da branch master, usando-o como repositório principal.
+
+Sendo assim, digamos que existem os seguintes commits neste momento no master do Github.
+
+
+M1<---M2<---M3
+
+
+(Podem notar que representei os commits como um grafo não-cíclico, pois é desta maneira que o Git organiza os commits internamente.)
+
+Após fazer o clone do repositório, você faz mais 2 commits locais (C1 e C2). Na sua máquina, o repositório ficará parecido com o seguinte:
+
+
+                  .---C1<---C2
+                 /
+M1<---M2<---M3<-´
+
+
+Contudo, no Gibhub, outros desenvolvedores já fizeram o push de mais 3 commits no master enquanto você tem ainda seus 2 commits que estão apenas no seu repositório local. No master do Github, teremos então a seguinte situação:
+
+
+M1<---M2<---M3<---M4<---M5<---M6
+
+
+Agora chegamos ao ponto crucial: como suas alterações farão merge com as alterações dos outros desenvolvedores?
+
+Com o git merge, o Git vai gerar um novo commit que concentra as alterações que ocorreram frutos deste merge dos commits C1 e C2 com os commits M4, M5 e M6.
+
+Se o usuário fizer um git fetch2, irá receber as alterações e terá no seu repositório a seguinte situação:
+
+
+                  .---C1<---C2
+                 /
+M1<---M2<---M3<-´---M4<---M5<---M6
+
+
+Ao fazer o merge, obterá o commit M7, resultado deste merge:
+
+
+                  .----C1<---C2<----.
+                 /                   \
+M1<---M2<---M3<-´---M4<---M5<---M6<---`M7
+
+
+Como podem notar, o conceito é simples. Agora, o que ocorre quando fazemos um rebase?
+
+O git rebase é uma espécie de merge também, mas usa uma lógica diferente. Ao invés de gerar um novo commit, ele reaplica cada um dos commits da branch local "em cima" do último commit da branch remota.
+
+Ou seja, se temos 2 commits (C1 e C2), eles serão aplicados a partir do commit M7.
+
+Sendo assim, ao realizar o rebase, temos a situação:
+
+
+                                            .----C1’<---C2’
+                                           /
+M1<---M2<---M3<-´---M4<---M5<---M6<---M7<-´
+
+
+Notem que chamei o C1 e C2 agora de C1’ e C2’. Motivo? Após o rebase, estes commits não são os mesmos commits originais. Serão commits totalmente novos, até mesmo com o SHA (identificador único e hash) diferentes.
+
+No entanto, o conteúdo destes commits serão muitos similares aos dos originais. Mas, por qual motivo são similares e não exatamente iguais?
+
+Ao realizar o merge de cada commit local (C1 e C2), ocorrerão merges e até conflitos com os commits remotos (M4, M5 e M6), que podem modificar o conteúdo original dos arquivos envolvidos nos commits C1 e C2. O resultado deste merge e resolução de conflitos, portanto, serão o C1’ e C2’.
+
+Entendendo as diferenças entre as 2 opções, quando usar rebase ou merge?
+
+O rebase é muito útil para não “sujar” o histórico do repositório. Se não fizer o rebase, o git quase sempre3 vai criar um novo commit para o merge dos commits locais com os commits remotos. Este commit extra pode parecer inofensivo, mas torna-se um pequeno estorvo ao visualizar e entender a árvore de commits do git entre as várias branches.
+
+No mais, tirando ocasiões especiais, não recomendo o uso do rebase. Como rebase faz um merge para cada um dos commits da branch, o número de merges necessários é mais alto assim como o de conflitos (se ocorrer), e este trabalho aumenta a cada novo commit na branch. Se ainda não estiver convencido que esta opção é custosa, recomendo a leitura deste comentário no StackOverFlow.
+
+Outro contra do rebase, para algumas pessoas, é que quando vocês faz um rebase você está "mentindo" sobre o que está acontecendo no histórico do seu repositório.
+
+Mas o problema mais grave com o rebase não são estes. O rebase, muitas vezes por falta de conhecimento, é usado em branches remotas nos quais há desenvolvedores trabalhando ativamente nelas. Esta é a receita para o desastre. Porém, se ninguém está trabalhando na branch com commits pendentes, o rebase pode ser feito na branch remota de maneira segura.
+
+Depois destas considerações, na maioria dos casos é recomendado usar o merge: único momento de merge de alterações, único momento para resolver conflitos, não há risco de afetar o trabalho de outras pessoas, preserva a ordem real dos eventos no histórico mas com o efeito colateral de poluí-lo um pouco.
+
+O rebase é interessante apenas para ser aplicado no seu repositório local, onde temos normalmente poucos commits e apenas o próprio usuário realiza commits nela. No restante das situações, avalie com muito cuidado e tenha completo entendimento do que irá fazer.
+
+Esta última dica pode ser estendida, inclusive, para qualquer coisa que pretenda fazer com o Git: o entendimento da árvore de commits dele, ao meu ver, é essencial para entendimento e resolução de problemas. Deixe a decoreba de comandos do git para depois.
+
+
+1. No git não há o conceito de repositório central. O que acontece é que a equipe acaba elegendo um dos repositórios para concentrar as alterações que podem gerar versões do sistema. Quando utiliza-se o Github, o intuito acaba sendo dele virar este repositório.↩
+2. Ao fazer git pull, o git por trás dos bastidores faz exatamente um git fetch (recebe os novos commits do repositório remoto) e em seguida faz o git merge (merge dos commits remotos com os commits locais).↩
+3. Quando é possível fazer um fast-forward.↩

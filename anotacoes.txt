@@ -18,4 +18,5 @@
 O que pode ser bacana para a visualizacao dos commits, mas que pode ser ruim se você quiser visualizar quando foram inseridos os commits e de onde vieram.
 - git fetch: baixa os arquivos do repositorio origem. Nao faz o merge, apenas baixa os arquivos.
 - git pull: é a juncao dos comandos git fetch e git rebase/merge.
+    
 
