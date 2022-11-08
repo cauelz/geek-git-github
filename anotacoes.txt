@@ -13,6 +13,7 @@
     
 - git checkout <branch destino>: sai da branch atual e vai para a branch destino.
     - git checkout -b <nome branch>: cria uma nova branch e já muda pra ela.
+    - git checkout -- ./<nome arquivo> : Caso tenhamos feito alguma alteracao em algum arquivo, nós podemos voltar esta alteracao com este comandos. Utilizando o "." voltamos todos os arquivos.
 - git merge: é quando juntamos duas branches diferentes. Muitas vezes podem ter conflitos para serem resolvidos.
 - git rebase: funciona de forma parecida com o merge, a diferenca é que ele adiciona na linha do tempo principal da branch destino os commits.
 O que pode ser bacana para a visualizacao dos commits, mas que pode ser ruim se você quiser visualizar quando foram inseridos os commits e de onde vieram.
