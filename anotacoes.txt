@@ -28,3 +28,9 @@ O que pode ser bacana para a visualizacao dos commits, mas que pode ser ruim se 
 - git revert <commit id>: revert um commit criando um outro commit realizando a acao. Comando legal para manter o historico dos commits.
 
 - git reset HEAD˜<numero de commits>: o git reset traz as modificacoes novamente para o status de modificado e remove o commit localmente. É necessário realizar o git pull para trazer o Estado do repositorio remoto e realizar as modificacoes.
+
+
+************** Observacoes **************
+
+- Cenário SEM autenticacao por ssh: quando quisermos armazenar nossa credencial para logar no github e nao pedir a senha novamente,
+    podemos utilizar o seguinte comando git config.helper store. Ele vai armazenar nossas informacoes de login para nao ficar pedindo o tempo todo.
